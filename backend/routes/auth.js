@@ -24,6 +24,7 @@ router.post("/createuser" , ValidationCriteria , async(req,res)=>{
     const error = validationResult(req)
     if(!error.isEmpty()){
         return res.status(400).json({
+            success:false ,
             error : error.array()
         })
     }
@@ -33,7 +34,7 @@ router.post("/createuser" , ValidationCriteria , async(req,res)=>{
         let user = await User.findOne({email: req.body.email})
     
         if(user){
-            return res.status(400).json({error : "Email already exists"})
+            return res.status(400).json({success:false , error : "Email already exists"})
         }else{
 
             // encrypting the password
@@ -75,18 +76,18 @@ const ValidationCriteriaForAuth = [
 router.post("/login", ValidationCriteriaForAuth , async (req,res) =>{
     const error = validationResult(req)
     if(!error.isEmpty()){
-        return res.status(500).json({error : error.array})
+        return res.status(500).json({success:false , error : error.array})
     }
 
     const {email , password} = req.body
     try {
         const user = await User.findOne({email})
         if(!user){
-            return res.status(500).json({error : "Wrong Credentials"})
+            return res.status(500).json({success:false , error : "Wrong Credentials"})
         }else{
             const passwordCompare = await bcrypt.compare(password , user.password)
             if(!passwordCompare){
-                return res.status(500).json({error : "Wrong Credentials"})
+                return res.status(500).json({success:false , error : "Wrong Credentials"})
             }else{
                 const payload = {
                     id : user.id
@@ -113,7 +114,7 @@ router.post("/getuser", fetchuser ,async (req,res) =>{
         // console.log(req.user)
         const userId = req.user.id
         const user = await User.findById(userId).select("-password")
-        res.send(user)
+        res.json({success : true , user:user})
 
     } catch (error) {
         console.log(error.message)
