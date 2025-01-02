@@ -56,7 +56,7 @@ router.post("/createuser" , ValidationCriteria , async(req,res)=>{
             // console.log(authToken)
             res.json({
                 success : true , 
-                authtoken : authToken
+                authToken : authToken
             })
         }
     } catch (error) {
